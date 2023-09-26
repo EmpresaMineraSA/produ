@@ -48,7 +48,7 @@ public class Registromuestra extends  JFrame{
 
                         txt_nombre.setText(rs.getString("dia"));
                         txt_grupo.setText(rs.getString("promedio_mineral"));
-                        txt_mineral.setText(rs.getString("elemento").trim());
+                        txt_mineral.setText(rs.getString("elemento"));
 
 
                     }else{
@@ -73,33 +73,81 @@ public class Registromuestra extends  JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
 
+
                 try {
 
+
+
+
                     Connection cn = DriverManager.getConnection("jdbc:mysql://localhost/bd_minera","root","");
-                    PreparedStatement pst = cn.prepareStatement("select avg(promedio_mineral), elemento as promedio from minera3 where nombre_linea = ? GROUP by elemento;");
-                    pst.setString(1,txt_buscar2.getText().toLowerCase().trim());
-                    //pst.setString(2,nombreElemento.getText().toLowerCase().trim());
+                    PreparedStatement pst = cn.prepareStatement("SELECT AVG(promedio_mineral) as promedio,elemento,nombre_linea FROM minera3 WHERE nombre_linea=? AND elemento=? GROUP by elemento");
+                    pst.setString(1, txt_buscar2.getText().trim());
+                    pst.setString(2,nombreElemento.getText().trim());
 
 
                     ResultSet rs = pst.executeQuery();
 
                     if (rs.next()){
 
+                        cumplimiento.setText(rs.getString("promedio"));
+
+                        if (rs.getString("nombre_linea").trim().equals("alimento")){
 
 
-                        if (rs.getString("elemento").equals("cu")){
 
-                            
+                            if(rs.getString("elemento").trim().equals("fe")){
+
+                                double prom,calculo ;
+                                String visualiza;
+                                prom = Double.parseDouble(rs.getString("promedio"));
+                                calculo = prom / (53*100);
+                                visualiza = String.valueOf(calculo);
+                                System.out.printf(visualiza);
+
+
+                                txt_mincum.setText(visualiza);
+
+                                if (prom > calculo){
+
+                                    txt_verifica.setText("Si cumple");
+
+                                } else{
+                                    txt_verifica.setText("No cumple");
+
+                                }
+
+
+
+                            }else if (rs.getString("elemento").trim().equals("s")){
+                                System.out.println("ingresa");
+
+                                double prom2,calculo2 ;
+                                String visualiza2;
+                                prom2 = Double.parseDouble(rs.getString("promedio"));
+                                System.out.println(prom2);
+                                calculo2 = 4 / (prom2*100);
+                                visualiza2 = String.valueOf(calculo2);
+                                System.out.printf(visualiza2);
+
+
+                                txt_mincum.setText(visualiza2);
+
+                                if (prom2 < calculo2){
+
+                                    txt_verifica.setText("Si cumple");
+
+                                } else{
+                                    txt_verifica.setText("No cumple");
+
+                                }
+
+
+
+                            }
+
 
                         }
 
-                        String promedio;
-
-                        promedio = rs.getString("promedio");
-
-
-
-                        cumplimiento.setText(rs.getString("promedio"));
 
 
 
@@ -118,6 +166,19 @@ public class Registromuestra extends  JFrame{
                 }
 
 
+
+
+
+
+
+
+
+
+            }
+        });
+        registrarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
 
 
@@ -151,6 +212,9 @@ public class Registromuestra extends  JFrame{
     private JTextField nombreElemento;
     private JButton buscarmes;
     private JTextField txt_buscar2;
+    private JTextField txt_mincum;
+    private JTextField txt_verifica;
+    private JComboBox comboBox1;
 
 
 }
